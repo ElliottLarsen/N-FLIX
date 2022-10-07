@@ -1,6 +1,11 @@
 # N-FLIX
 
 ## Technologies
+* Python
+* Pandas
+* NumPy
+* Scikit-Learn
+* Jupyter Notebook
 
 ## GIF Walkthrough
 ### Testing the Model
