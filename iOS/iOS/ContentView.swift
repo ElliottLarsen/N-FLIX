@@ -10,35 +10,57 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var movieList: MovieList?
+    @State private var recommendations: Recommendations?
     @State private var selected_title = ""
     
     var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Picker("movie_title", selection: $selected_title) {
-                        ForEach(movieList?.titles ?? [""], id: \.self) {
-                            Text($0)
-                        }
-                    }
-                    .pickerStyle(.wheel)
+        VStack {
+            Picker("movie_title", selection: $selected_title) {
+                ForEach(movieList?.titles ?? [""], id: \.self) {
+                    Text($0)
                 }
             }
-            .navigationTitle("Please select a movie")
-            // Testing.
-            VStack {
-                Button(action: {getRecommendations(selected_title: selected_title)}) {
-                    Image(systemName: "magnifyingglass")
+            .pickerStyle(.wheel)
+            
+            
+            Button(action: {getRecommendations(selected_title: selected_title)}) {
+                Text("Search")
+                    .bold()
+                    .padding(20)
+                    .foregroundColor(Color.white)
+                    .background(Color.black)
+                    .cornerRadius(15)
+            }
+            
+            /*
+            ForEach(recommendations?.images ?? [""], id: \.self) {
+                 AsyncImage(url: URL(string: $0))
+             }
+             */
+
+            .onAppear(perform: getMovieList)
+        }
+    }
+    
+    
+    private func getRecommendations(selected_title: String) {
+        // Get 10 recommendations based on the input title.
+        let selected_title = selected_title
+        let url_title = selected_title.replacingOccurrences(of: " ", with: "%20")
+        guard let url = URL(string: "http://127.0.0.1:8000/movies/\(url_title)") else {
+            return
+        }
+        URLSession.shared.dataTask(with: url) {data, response, error in
+            guard let data = data else {return}
+            if let decodedData = try? JSONDecoder().decode(Recommendations.self, from: data) {
+                DispatchQueue.main.async {
+                    self.recommendations = decodedData
                 }
             }
         }
-        .onAppear(perform: getMovieList)
+        .resume()
     }
     
-    // Need to make another API call to the backend server.
-    private func getRecommendations(selected_title: String) {
-        print(selected_title)
-    }
     
     private func getMovieList() {
         // Get movie list.
@@ -62,6 +84,10 @@ struct MovieList: Decodable {
     var titles: [String]
 }
 
+struct Recommendations: Decodable {
+    var titles: [String]
+    var images: [String]
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
