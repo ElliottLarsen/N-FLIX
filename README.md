@@ -19,3 +19,9 @@
 <p>
 <image src = "N-Flix.gif" title = "Testing the Model"><br>
 </p>
+<br>
+
+### iOS Application
+<p>
+<image src = "frontend.gif" title = "Frontend Application"><br>
+</p>
