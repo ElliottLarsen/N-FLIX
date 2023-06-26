@@ -12,9 +12,13 @@ struct ContentView: View {
     @State private var movieList: MovieList?
     @State private var recommendations: Recommendations?
     @State private var selected_title = ""
+    let columns = [
+        GridItem(.flexible())
+    ]
     
     var body: some View {
         VStack {
+            // Movie Picker from the GET /movies endpoint.
             Picker("movie_title", selection: $selected_title) {
                 ForEach(movieList?.titles ?? [""], id: \.self) {
                     Text($0)
@@ -24,6 +28,7 @@ struct ContentView: View {
             
             
             Button(action: {getRecommendations(selected_title: selected_title)}) {
+                // Calls GET /movies/{title}.
                 Text("Search")
                     .bold()
                     .padding(20)
@@ -32,11 +37,22 @@ struct ContentView: View {
                     .cornerRadius(15)
             }
             
-            /*
-            ForEach(recommendations?.images ?? [""], id: \.self) {
-                 AsyncImage(url: URL(string: $0))
-             }
-             */
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(recommendations?.images ?? [""], id: \.self) {
+                        // Displays the movie posters.
+                        AsyncImage(url: URL(string: $0)) { image in image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .frame(maxHeight: 500)
+            
 
             .onAppear(perform: getMovieList)
         }
