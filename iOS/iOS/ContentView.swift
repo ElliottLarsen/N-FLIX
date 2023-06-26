@@ -45,7 +45,7 @@ struct ContentView: View {
                                 .resizable()
                                 .scaledToFill()
                         } placeholder: {
-                            ProgressView()
+                            Color.white
                         }
                     }
                 }
